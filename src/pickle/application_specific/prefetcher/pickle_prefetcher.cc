@@ -83,40 +83,6 @@ PicklePrefetcher::PicklePrefetcher(
     workCount(0),
     prefetcherStats(this)
 {
-    panic_if(
-        software_hint_prefetch_distance < \
-            prefetch_distance_offset_from_software_hint,
-        "Prefetch distance offset from software hint must not be greater "
-        "than the prefetch distance\n"
-    );
-
-    panic_if(
-        concurrent_work_item_capacity < 1,
-        "The prefetcher must be able to handle at least 1 work item at a time"
-        "\n"
-    );
-
-    panic_if(
-        prefetch_mode == PrefetchMode::UNKNOWN,
-        "Unknown prefetch mode\n"
-    );
-
-    panic_if(
-        (prefetch_mode == PrefetchMode::BULK_PREFETCH) &&
-        (bulk_prefetch_chunk_size <= 0),
-        "Chunk size must be positive when prefetch_mode is BULK "
-        "(chunk_size=%ld)\n",
-        bulk_prefetch_chunk_size
-    );
-
-    panic_if(
-        (prefetch_mode == PrefetchMode::BULK_PREFETCH) &&
-        (bulk_prefetch_num_prefetches_per_hint <= 0),
-        "Num prefetches per hint must be positive when prefetch_mode is BULK ",
-        "(num_prefetches_per_hint=%ld)\n",
-        bulk_prefetch_num_prefetches_per_hint
-    );
-
     prefetcher_work_tracker_collective =
         std::shared_ptr<PrefetcherWorkTrackerCollective>(
             new PrefetcherWorkTrackerCollective(

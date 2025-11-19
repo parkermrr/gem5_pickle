@@ -95,6 +95,7 @@ class PicklePrefetcher(ClockedObject):
 
     # Prefetcher design choices
     llc_prefetch_agents = VectorParam.LLCPrefetchAgent(
+        [],
         "The LLC prefetch agent(s) that this prefetcher sends prefetches to.",
     )
 
