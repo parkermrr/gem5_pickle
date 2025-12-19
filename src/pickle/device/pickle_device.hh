@@ -51,6 +51,7 @@
 #include "mem/ruby/protocol/CHI/Cache_Controller.hh"
 #include "params/PickleDevice.hh"
 #include "pickle/application_specific/prefetcher/pickle_prefetcher.hh"
+#include "pickle/application_specific/skiplist/pickle_skiplist.hh"
 #include "pickle/device/device_thread_context.hh"
 #include "pickle/device/thread_monitor.hh"
 #include "pickle/gadgets/traffic_snooper.hh"
