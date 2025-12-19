@@ -29,21 +29,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __PICKLE_SKIPLIST_HH__
-#define __PICKLE_SKIPLIST_HH__
+#ifndef __CEREBELLUM_SKIPLIST_HH__
+#define __CEREBELLUM_SKIPLIST_HH__
 #define LOCAL_CACHE_LINE_SIZE 64
 #define NUM_LEVELS 20
 #define KEY_SIZE 16
 #define KEY_CHUNK_SIZE 64
 
-#include <tuple>
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
+#include <tuple>
 
-#include "params/PickleSkipList.hh"
 #include "pickle/device/pickle_device.hh"
+#include "params/PickleSkipList.hh"
 #include "sim/sim_object.hh"
-
 namespace gem5
 {
 
@@ -56,7 +55,7 @@ enum class SkipListState
 
 enum class InsertRequestState
 {
-        IDLE = 0,
+	IDLE = 0,
     BEGIN = 1,
     FINDLIST = 2,
     TRAVERSE = 3,
@@ -66,29 +65,29 @@ enum class InsertRequestState
 
 enum class FindListState
 {
-        IDLE = 0,
+	IDLE = 0,
     BEGIN = 1,
     GATHER = 2,
-        TRAVERSE = 3,
+	TRAVERSE = 3,
     DONE = 4
 };
 
 enum class InsertInChunkState
 {
-        IDLE = 0,
-        BEGIN = 1,
-        LOADLEVELS = 2,
-        INSERTSPLICE = 3,
+	IDLE = 0,
+	BEGIN = 1,
+	LOADLEVELS = 2,
+	INSERTSPLICE = 3,
     DONE = 4
 };
 
 enum class GetRequestState
 {
-        IDLE = 0,
+	IDLE = 0,
     BEGIN = 1,
     FINDLIST = 2,
     TRAVERSE = 3,
-        NEXTLEVELCHECK = 4,
+	NEXTLEVELCHECK = 4,
     DONE = 5
 };
 
@@ -109,7 +108,7 @@ class PickleSkipList: public SimObject
                 Addr Create(PickleSkipList* list);
                 void Load(PickleSkipList* list, Addr loc, int line = -1);
                 void Write(PickleSkipList* list, Addr loc, int line = -1);
-                        // std::string ToString();
+    			// std::string ToString();
         };
 
         class LevelChunk
@@ -121,17 +120,17 @@ class PickleSkipList: public SimObject
                 Addr nextLevels[NUM_LEVELS];
                 LevelChunk();
                 void setKey(unsigned char* newKey);
-                        Addr Create(PickleSkipList* list);
+    			Addr Create(PickleSkipList* list);
                 void Load(PickleSkipList* list, Addr loc, int line = -1);
                 void Write(PickleSkipList* list, Addr loc, int line = -1);
-                        // std::string ToString();
+    			// std::string ToString();
         };
 
         class InsertJob
         {
             public:
-                                unsigned char readLine[64];
-                                Addr readOffset;
+				unsigned char readLine[64];
+				Addr readOffset;
                 unsigned char key[16];
                 Addr data;
                 int levels;
@@ -145,8 +144,8 @@ class PickleSkipList: public SimObject
         class GetJob
         {
             public:
-                                unsigned char readLine[64];
-                                Addr readOffset;
+				unsigned char readLine[64];
+				Addr readOffset;
                 unsigned char key[16];
                 LevelChunk* foundLevelChunk;
                 KeyChunk* currentKeyChunk;
@@ -162,7 +161,7 @@ class PickleSkipList: public SimObject
                 unsigned char key[16];
                 LevelChunk* currentChunk;
                 Addr currentChunkAddr;
-                                std::unordered_map<Addr, LevelChunk*> nextLevelPartials;
+				std::unordered_map<Addr, LevelChunk*> nextLevelPartials;
                 int numLoads;
                 LevelChunk* foundList;
         };
@@ -183,11 +182,11 @@ class PickleSkipList: public SimObject
         };
 
     private:
-        SkipListState skipListState = SkipListState::IDLE;
-        InsertRequestState insertRequestState = InsertRequestState::IDLE;
-        GetRequestState getRequestState = GetRequestState::IDLE;
-        FindListState findListState = FindListState::IDLE;
-        InsertInChunkState insertInChunkState = InsertInChunkState::IDLE;
+    	SkipListState skipListState = SkipListState::IDLE;
+    	InsertRequestState insertRequestState = InsertRequestState::IDLE;
+    	GetRequestState getRequestState = GetRequestState::IDLE;
+    	FindListState findListState = FindListState::IDLE;
+    	InsertInChunkState insertInChunkState = InsertInChunkState::IDLE;
 
         InsertJob* insertJob;
         GetJob* getJob;
@@ -197,42 +196,42 @@ class PickleSkipList: public SimObject
         PickleDevice* owner;
         std::unordered_map<Addr, std::tuple<unsigned char*, int>> inFlightLoads;
         Addr headAddr;
-                Addr levelChunkFreeList;
-                Addr keyChunkFreeList;
-                int levelChunkFree = 1000;
-                int keyChunkFree = 1000;
-                uint8_t taskID;
-                int numLoads = 0;
+		Addr levelChunkFreeList;
+		Addr keyChunkFreeList;
+		int levelChunkFree = 1000;
+		int keyChunkFree = 1000;
+		uint8_t taskID;
+		int numLoads = 0;
         PARAMS(PickleSkipList);
 
     public:
         PickleSkipList(const PickleSkipListParams &params);
         ~PickleSkipList();
-        void setOwner(PickleDevice* engine);
-                bool commandReceived(const uint64_t &command, uint8_t id);
-                void receiveLoadResponse(const uint64_t& vaddr, std::unique_ptr<uint8_t[]> p);
-                void clockTick();
+        void setOwner(PickleDevice* owner);
+		bool commandReceived(const uint64_t &command, uint8_t id);
+		void receiveLoadResponse(const uint64_t& vaddr, std::unique_ptr<uint8_t[]> p);
+		void clockTick();
 
-                // the interface
-                void Initialize();
+		// the interface
+		void Initialize();
         void Insert();
-                bool Contains(unsigned char* key);
-                void Get();
+		bool Contains(unsigned char* key);
+		void Get();
         std::string GetKey(unsigned char* key);
-                // std::string ToString();
+		// std::string ToString();
 
 
     private:
         void InsertInChunk();
         void FindList();
-                uint64_t DecodeFixed64(const unsigned char* ptr);
+		uint64_t DecodeFixed64(const unsigned char* ptr);
         bool GreaterEqualBytes(unsigned char* a, unsigned char* b); // returns true iff a >= b
-                bool GreaterBytes(unsigned char* a, unsigned char* b); // returns true iff a > b
-                bool EqualBytes(unsigned char* a, unsigned char* b);
-                bool IsZero(unsigned char* a);
-                void SwapBytes(unsigned char* a, unsigned char* b);
+		bool GreaterBytes(unsigned char* a, unsigned char* b); // returns true iff a > b
+		bool EqualBytes(unsigned char* a, unsigned char* b);
+		bool IsZero(unsigned char* a);
+		void SwapBytes(unsigned char* a, unsigned char* b);
 };
 
 }; // namespace gem5
 
-#endif // __PICKLE_SKIPLIST_HH__
+#endif // __CEREBELLUM_SKIPLIST_HH__
