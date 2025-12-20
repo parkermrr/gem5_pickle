@@ -282,7 +282,7 @@ PickleSkipList::~PickleSkipList()
 {
 }
 
-void PickleSkipList::setEngine(PickleDevice* owner)
+void PickleSkipList::setOwner(PickleDevice* owner)
 {
     this->owner = owner;
 }
